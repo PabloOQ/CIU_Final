@@ -1,19 +1,14 @@
 class GameEye{
-  int health;
-  PVector pos;
-  PVector size;
-  int rads;
+  volatile int health;
   
-  public GameEye(PVector pos, PVector size){
-    setPos(pos);
-    setSize(size);
+  public GameEye(){
     setHealth(100);
   }
   
-  public void setHealth(int health){
+  public synchronized void setHealth(int health){
     this.health = health;
   }
-  
+/*
   public void setPos(PVector pos){
     this.pos = pos.copy();
   }
@@ -32,16 +27,16 @@ class GameEye{
   public float getMinRadius(){
     return min(size.x, size.y);
   }
-  
-  public int getHealth(){
+  */
+  public synchronized int getHealth(){
     return health;
   }
-  
+  /*
   public PVector getPos(){
     return pos.copy();
   }
 
   public PVector getSize(){
     return size.copy();
-  }
+  }*/
 }

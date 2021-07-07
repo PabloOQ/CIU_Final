@@ -10,8 +10,9 @@ class RealEyebrow extends FShape{
     return face;
   }
   
-  public void setFace(RealFace face){
+  public void setFace(RealFace face, float camSize){
     this.face = face;
+    this.camSize = camSize;
   }
   
   public PVector getTop(){
@@ -28,6 +29,17 @@ class RealEyebrow extends FShape{
       return top;
     }
     return null;
+  }
+  
+  public RealEyebrow copy(PImage img, int cam_x, int cam_y){
+    PVector[] contour = new PVector[this.contour.length];
+    for(int i = 0; i < this.contour.length; i++){
+      contour[i] = this.contour[i].copy();
+    }
+    
+    RealEyebrow newEyebrow = new RealEyebrow();
+    newEyebrow.setPoints(contour, img, (int)cam_x, (int)cam_y);
+    return newEyebrow;
   }
   
 }

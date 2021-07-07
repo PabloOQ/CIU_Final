@@ -1,16 +1,20 @@
 class Bullet{
+  
   float radius;
   PVector pos;
-  PVector speed;
+  int speed;
+  int angle;
 
-  public Bullet(PVector pos, PVector speed, float radius){
+  public Bullet(PVector pos, int speed, float radius, int angle){
     setPos(pos);
     setSpeed(speed);
     setRadius(radius);
+    
+    this.angle = angle;
   }
 
-  public void setSpeed(PVector speed){
-    this.speed = speed.copy();
+  public void setSpeed(int speed){
+    this.speed = speed;
   }
 
   public void setPos(PVector pos){
@@ -21,8 +25,8 @@ class Bullet{
     this.radius = radius;
   }
 
-  public PVector getSpeed(){
-    return speed.copy();
+  public int getSpeed(){
+    return speed;
   }
 
   public PVector getPos(){
@@ -32,4 +36,9 @@ class Bullet{
   public float getRadius(){
     return radius;
   }
+  
+  public int getAngle() {
+    return angle;
+  }
+  
 }

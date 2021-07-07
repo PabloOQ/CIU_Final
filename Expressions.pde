@@ -16,11 +16,43 @@ static class Expressions{
     return -1;
   }
   
+  public static float verticalAmplitude(PVector[] contour){
+    int size = contour.length;
+    PVector a = null;
+    PVector b = null;
+    int aux;
+    if((size/4)%1 != 0) aux = (int)Math.ceil(size/4);  
+    else aux = (int)Math.ceil((size/4)+1);
+    a = contour[aux];
+    b = contour[aux + (size/2)];
+
+    return dist(a.x, a.y, b.x, b.y);
+  }
+
+  public static float heightDistance(PVector[] contour){
+    PVector[] minMax = getMinMax(contour);
+    return minMax[1].y - minMax[0].y; 
+  }
+
   public static boolean isOpen(FShape shape){
-    if (verticalAmplitude(shape) > 25) return true;
+    //println(verticalAmplitude(shape) / shape.getCamSize());
+    if (verticalAmplitude(shape) / shape.getCamSize() > 25) return true;
     return false;
   }
   
+  public static boolean isOpen(PVector[] contour, int imgSize, float threshold){
+    /*println("a: " + verticalAmplitude(contour));
+    println("b: " + imgSize);
+    println("c: " + verticalAmplitude(contour)/imgSize);*/
+    if (verticalAmplitude(contour) / imgSize > threshold) return true;
+    return false;
+  }
+
+  public static boolean isOpen2(PVector[] contour, float threshold){
+    return heightDistance(contour) > threshold;
+  }
+
+
   /**
     * Checks if the eyebrow is lifted
     * side = 0: left eyebrow
@@ -28,16 +60,16 @@ static class Expressions{
     */
   public static boolean eyebrowIsLifted(RealEyebrow eyebrow){
     if (eyebrow != null) {
-      println("distancia centro-ceja = " + (eyebrow.getFace().getCenter().y - eyebrow.getTop().y));
+      //println("distancia centro-ceja = " + (eyebrow.getFace().getCenter().y - eyebrow.getTop().y));
       if (eyebrow.getFace().getCenter().y - eyebrow.getTop().y > 50) return true;
     }
     return false;
   }
   
-  public static PVector[] getMinMax(PVector[] contour, float w, float h){
+  public static PVector[] getMinMax(PVector[] contour/*, float w, float h*/){
     //println("Contour: "+ (Object[])contour);
     PVector max = new PVector(0, 0);
-    PVector min = new PVector(w, h);
+    PVector min = new PVector(Integer.MAX_VALUE, Integer.MAX_VALUE);
     for (PVector point : contour){
       //println("Point: " + point);
       if (point.x > max.x) max.x = point.x;
@@ -49,20 +81,45 @@ static class Expressions{
     return new PVector[]{min, max};
   }
   
-  public static PVector centerOf(PVector[] contour, float w, float h){
+  public static PVector[] getCorners(PVector[] contour/*, float w, float h*/){
+    //println("Contour: "+ (Object[])contour);
+    PVector topLeft = new PVector(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    PVector topRight = new PVector(0, Integer.MAX_VALUE);
+    PVector bottomLeft = new PVector(Integer.MAX_VALUE, 0);
+    PVector bottomRight = new PVector(0, 0);
+    
+    for (PVector point : contour){
+      //println("Point: " + point);
+      if (point.x < topLeft.x) topLeft.x = point.x;
+      if (point.y < topLeft.y) topLeft.y = point.y;
+      
+      if (point.x > topRight.x) topRight.x = point.x;
+      if (point.y < topRight.y) topRight.y = point.y;
+      
+      if (point.x < bottomLeft.x) bottomLeft.x = point.x;
+      if (point.y > bottomLeft.y) bottomLeft.y = point.y;
+      
+      if (point.x > bottomRight.x) bottomRight.x = point.x;
+      if (point.y > bottomRight.y) bottomRight.y = point.y;
+    }
+    
+    return new PVector[]{topLeft, topRight, bottomLeft, bottomRight};
+  }
+  
+  public static PVector centerOf(PVector[] contour/*, float w, float h*/){
     if (contour != null){
       /**PVector max = contour[0];
       PVector min = contour[0];**/
-      PVector[] minMax = getMinMax(contour, w, h);
+      PVector[] minMax = getMinMax(contour/*, w, h*/);
       return new PVector(minMax[0].x + ((minMax[1].x - minMax[0].x) / 2), minMax[0].y + ((minMax[1].y - minMax[0].y) / 2));//new Point(min.x + d/2, min.y + d/2);
     }
     return null;
   }
   
   public static float distance(FShape a, FShape b){
-    println("FShape a = " + a.getCenter());
-    println("FShape b = " + b.getCenter());
-    println(dist(a.getCenter().x, a.getCenter().y, b.getCenter().x, b.getCenter().y));
+    //println("FShape a = " + a.getCenter());
+    //println("FShape b = " + b.getCenter());
+    //println(dist(a.getCenter().x, a.getCenter().y, b.getCenter().x, b.getCenter().y));
     return dist(a.getCenter().x, a.getCenter().y, b.getCenter().x, b.getCenter().y);
   }
   
@@ -78,10 +135,10 @@ static class Expressions{
     return calibrationFactor / reference;
   }
   
-  public static float rotationOf(RealFace face){
+  /*public static float rotationOf(RealFace face){
     PVector line = PVector.sub(face.getCenter(),face.getChin());
     return PVector.angleBetween(line, new PVector(10,0));
-  }
+  }*/
   
   public static PVector makeRelative(PVector v, PVector center){
     return PVector.sub(v, center);

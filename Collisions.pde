@@ -67,7 +67,23 @@ static class Collisions{
   static public boolean pointWithQuadrilateral(PVector[] points){
 
   }*/
+  static public boolean pointWithPolygon(PVector point, PVector[] polygon){
+    boolean col = false;
 
+    int next = 0;
+    for (int current = 0; current < polygon.length; current++){
+      next = current + 1;
+      if (next == polygon.length){
+        next = 0;
+      }
+      if (((polygon[current].y >= point.y && polygon[next].y < point.y) ||
+        (polygon[current].y < point.y && polygon[next].y >= point.y)) &&
+        (point.x < (polygon[next].x - polygon[current].x) * (point.y - polygon[current].y) / (polygon[next].y - polygon[current].y) + polygon[current].x)){
+        col = !col;
+      }
+    }
+    return col;
+  }
 
   //FIXME: división por 0
   //se podría comprobar antes de llamar, ninguna elipse tiene tamaño 0
@@ -112,6 +128,15 @@ static class Collisions{
     return lineWithCircle(linePointA, linePointB, cirPos, radius);
   }*/
 
+  //remember to check if radius is the param you are using
+  static public boolean circleWithCircle(PVector cirAPos, float radiusA, PVector cirBPos, float radiusB){    
+    if (dist(cirAPos.x, cirAPos.y, cirBPos.x, cirBPos.y) <= radiusA + radiusB){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
 
   static public boolean circleWithPolygon(PVector cirPos, float radius, PVector[] polygon){
     boolean collision = false;
@@ -129,7 +154,8 @@ static class Collisions{
         return true;
       }
     }
-    //return pointWithPolygon(cirPos, polygon);
-    return false;
+    return pointWithPolygon(cirPos, polygon);
+    //return false;
   }
+
 }

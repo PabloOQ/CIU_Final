@@ -563,8 +563,6 @@ synchronized void bulletsThread(){
   boolean mouthOpen = mouthThreshold < mouthDist;
   boolean rightEyeOpen = eyeThreshold < rightEyeDist;
   boolean leftEyeOpen = eyeThreshold < leftEyeDist;
-  println(leftEyeDist);
-  println(rightEyeDist);
   RealFace face = currentFace;
   if (mouthOpen){
     if ((rightEyeOpen && 0 < gameFace.getRightEye().getHealth()) ||

@@ -87,11 +87,9 @@ void setup(){
   palette = new Palette(color(43,48,58),
                         color(230,57,70),
                         color(11,0,51),
-                        color(73,109,219),   //121,29,61
-                        color(177,78,237),   // 170 171 186
-                        color(193,202,214)); //bad 143,126,79
-
-
+                        color(73,109,219),
+                        color(177,78,237),
+                        color(193,202,214));
 
   state = MENU;
 
@@ -168,14 +166,14 @@ void setupGame(){
                           new GameEye(),
                           new GameEye());
   PVector shipPos = new PVector(width - 50, height - 50);
-  int shipHealth = 100;
+  int shipHealth = 70;
   ship = new Ship(shipPos, shipHealth);
   int maxVelocityShip = 10;
   int bulletVelocity = 10;
   int framesBetweenBullets = 10;
   int framesBetweenFaceBullets = framesBetweenBullets * 2;
   float bulletRadius = 10;
-  objController = new ControlObjects(ship, maxVelocityShip, bulletVelocity, framesBetweenBullets, framesBetweenFaceBullets, bulletRadius);
+  objController = new ControlObjects(this, ship, maxVelocityShip, bulletVelocity, framesBetweenBullets, framesBetweenFaceBullets, bulletRadius);
   rightEyeBar = new Bar(gameFace.getRightEye().getHealth());
   leftEyeBar = new Bar(gameFace.getLeftEye().getHealth());
   shipBar = new Bar(ship.getHealth());
@@ -183,12 +181,6 @@ void setupGame(){
   sadSound = new SoundFile(this, "sounds/sad_end.wav");
   happySound = new SoundFile(this, "sounds/happy_end.wav");
   song = new SoundFile(this, "sounds/song1.wav");
-
-  /*
-  //define length
-  for (int i = 0; i < mouthSounds.length; i++) {
-    mouthSounds[i] = new SoundFile(this, "sounds/boca" + (i+1));
-  }*/
 }
 
 void setupMenu(){
@@ -208,13 +200,11 @@ void setupMenu(){
 }
 
 void draw(){
-
-  //background(palette.getBackground());
   pushStyle();
+  //tint(255, 255, 255, 127);
   count += 0.05;
-  float imgW = width*2; //*2
+  float imgW = width*2;
   float imgH = height*1.5;
-  tint(255, 255, 255, 127);
   image(bg, sin(radians(count))* imgW/4 + (-imgW/2 + width/2), 0, imgW, imgH);
   popStyle();
 
@@ -240,10 +230,6 @@ void draw(){
       }else{
         face = lastUsableFace;
       }
-      /*fill(255,0,0);
-      test(rightEye, face);
-      fill(0,0,255);
-      test(leftEye, face);*/
       if (debug){
         beginShape();
         for (int i = 0; i < leftEye.length; i++) {
@@ -265,7 +251,6 @@ void draw(){
         endShape();
       }
       lastUsableFace = currentFace;
-      //storeEyes();
       break;
     case POSTGAME:
       gameShow();
@@ -274,48 +259,8 @@ void draw(){
       break;
     default:
       throw new java.lang.RuntimeException("State is not contemplated");
-  }
-  //faceInterface.test();
-  /*
-  collectControllerData();
-  delay(20);
-  if (currentControllerData.getL_BUMP() !=lastControllerData.getL_BUMP()){
-    println("hola");
-  }
-  if (currentControllerData.getR_BUMP() !=lastControllerData.getR_BUMP()){
-    println("adios");
-  }*/
-  
+  }  
 }
-
-/*void test(PVector[] arr, RealFace face){
-  noStroke();
-  beginShape();
-  float imgWidth = faceWidthShow;
-  float imgHeight = imgWidth/currentFace.getCropRatio();
-  PImage crop = currentFace.getCrop();
-
-  float ratioX = imgWidth/crop.width;
-  float ratioY = imgHeight/crop.height;
-
-  for (int i = 0; i < arr.length; i++) {
-    arr[i] = Expressions.makeRelative(arr[i], face.getCenter());
-    arr[i].x = arr[i].x*ratioX;
-    arr[i].y = arr[i].y*ratioY;
-    arr[i].x = width/2 + arr[i].x;
-    arr[i].y = height/2 + arr[i].y;
-
-    vertex(arr[i].x, arr[i].y);
-  }
-  endShape();
-
-  stroke(255,255,0);
-  if (Collisions.circleWithPolygon(new PVector(mouseX, mouseY), 10, arr)){
-    fill(255,0,0);
-  }else{
-    fill(0,255,0);
-  }
-}*/
 
 void serialEvent(Serial port){
   String received = port.readStringUntil('¿');
@@ -336,8 +281,8 @@ void keyAllScreens(){
   Palette[] colors= { new Palette(color(43,48,58),
                                   color(230,57,70),
                                   color(11,0,51),
-                                  color(73,109,219),   //121,29,61
-                                  color(177,78,237),   // 170 171 186
+                                  color(73,109,219),
+                                  color(177,78,237),
                                   color(193,202,214)),
                       new Palette(color(255,255,255),
                                   color(80,81,79),
@@ -374,13 +319,10 @@ void introLogic(){
 }
 
 void menuLogic(){
-  //count += 0.05;
-  //press = mousePressed;
   
   
   if (mousePressed && !previouslyPressed) {
     previouslyPressed = true;
-    //press = false;
     playButton.click();
     aboutButton.click();
     quitButton.click();
@@ -388,7 +330,6 @@ void menuLogic(){
   } 
   if (previouslyPressed && !mousePressed) {
     previouslyPressed = false;
-    //press = true;
     if (backButton.release()) menuState = 0;
     if (playButton.release()){
       state = GAME;
@@ -398,14 +339,16 @@ void menuLogic(){
       }
     }
     if (aboutButton.release()) menuState = 2;
-    if (quitButton.release()) menuState = 3;
+    if (quitButton.release()){
+      menuState = 3;
+      exit();
+    }
   }
 }
 
 void gameLogic(){
   collectControllerData();
   thread("bulletsThread");
-  //count += 0.05;
   //Process takes a lot of CPU, so we initialize all threads before doing it
   currentFaceSuccess = faceInterface.process(debug);
   checkValues();
@@ -460,14 +403,6 @@ void introShow(){
 }
 
 void menuShow(){
-  /*pushStyle();
-  tint(255, 255, 255, 127);
-
-  float imgW = width*2; //*2
-  float imgH = height*1.5;
-  image(bg, sin(radians(count))* imgW/4 + (-imgW/2 + width/2), 0, imgW, imgH);
-  popStyle();*/
-
   /**Desactivar todos los botones existentes antes del switch
    *No desactivarlos provoca que se puedan clickar incluso sin
    *ser visibles*/
@@ -537,6 +472,26 @@ void menuShow(){
 
 void gameShow(){
   gameFaceShow();
+
+  fill(255,0,20);
+  //Damaged left eye
+  if (gameFace.getLeftEye().getHealth() == 0){
+    beginShape();
+      for (int i = 0; i < leftEye.length; i++) {
+        vertex(leftEye[i].x, leftEye[i].y);
+      }
+    endShape();
+  }
+
+  //Damaged right eye
+  if (gameFace.getRightEye().getHealth() == 0){
+    beginShape();
+      for (int i = 0; i < rightEye.length; i++) {
+        vertex(rightEye[i].x, rightEye[i].y);
+      }
+    endShape();
+  }
+
   objController.dibuja();
 
   leftEyeBar.setCurrent(gameFace.getLeftEye().getHealth());
@@ -566,17 +521,6 @@ void gameFaceShow(){
   image(currentFaceImage,
         (float) width/2 - imgWidth/2,(float) height/2 - imgHeight/2,
         imgWidth, imgHeight);
-
-  //Damaged left eye
-  if (gameFace.getLeftEye().getHealth() == 0){
-
-  }
-
-  //Damaged right eye
-  if (gameFace.getRightEye().getHealth() == 0){
-
-  }
-
 }
 
 void postgameShow(){
@@ -590,26 +534,11 @@ void postgameShow(){
   }else{
     text = "SHIP WINS";
   }
+  stroke(255);
+  fill(255);
   text(text, width/2, height/2 - titleHeight/2);
   popStyle();
 }
-
-/*void checkCollision(PVector[] arr, RealFace face, GameEye eye){
-  float imgWidth = faceWidthShow;
-  float imgHeight = imgWidth/currentFace.getCropRatio();
-  PImage crop = currentFace.getCrop();
-
-  float ratioX = imgWidth/crop.width;
-  float ratioY = imgHeight/crop.height;
-
-  for (int i = 0; i < arr.length; i++) {
-    arr[i] = Expressions.makeRelative(arr[i], new PVector(width/2, height/2));
-    arr[i].x = arr[i].x*ratioX;
-    arr[i].y = arr[i].y*ratioY;
-    arr[i].x = width/2 + arr[i].x;
-    arr[i].y = height/2 + arr[i].y;
-  }
-}*/
 
 void printText(String[] text){
   pushStyle();
@@ -625,11 +554,6 @@ void printText(String[] text){
 
 
 //Threads
-/*void processThread(){
-  processThread = false;
-  currentFaceSuccess = faceInterface.process();
-  processThread = true;
-}*/
 
 synchronized void bulletsThread(){
   bulletsThread = false;
@@ -637,14 +561,15 @@ synchronized void bulletsThread(){
   float mouthDist = dist(mouth[3].x, mouth[3].y, mouth[9].x, mouth[9].y);
   float leftEyeDist = dist(leftEye[5].x, leftEye[5].y, leftEye[1].x, leftEye[1].y);
   float rightEyeDist = dist(rightEye[4].x, rightEye[4].y, rightEye[2].x, rightEye[2].y);
-  float mouthThreshold = 21;
-  float eyeThreshold = 6.3; //0.11; //0.105?
+  float mouthThreshold = 27;
+  float eyeThreshold = 7.3; //6.3; //0.11; //0.105?
 
 
   boolean mouthOpen = mouthThreshold < mouthDist;
   boolean rightEyeOpen = eyeThreshold < rightEyeDist;
   boolean leftEyeOpen = eyeThreshold < leftEyeDist;
-
+  println(leftEyeDist);
+  println(rightEyeDist);
   RealFace face = currentFace;
   if (mouthOpen){
     if ((rightEyeOpen && 0 < gameFace.getRightEye().getHealth()) ||
@@ -652,18 +577,16 @@ synchronized void bulletsThread(){
       PVector center = new PVector((mouth[9].x + mouth[3].x) / 2,
         (mouth[9].y + mouth[3].y) / 2);
       objController.faceShoot(center);
-      //ShootBullets
-      //mouthSounds[random(0, mouthSounds.length)].play();
     }
   }
 
   objController.checkController(lastControllerData, currentControllerData);
   objController.moveBullets();
-  if (leftEyeOpen){
+  if (leftEyeOpen && gameFace.getLeftEye().getHealth() != 0){
     objController.checkEyeCollision(leftEye, gameFace.getLeftEye());
   }
 
-  if (rightEyeOpen){
+  if (rightEyeOpen && gameFace.getRightEye().getHealth() != 0){
     objController.checkEyeCollision(rightEye, gameFace.getRightEye());
   }
   objController.checkCircleCollision();

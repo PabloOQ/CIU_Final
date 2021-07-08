@@ -2,6 +2,8 @@ import processing.sound.*;
 
 class ControlObjects{
   
+  private PApplet parent;
+
   private ControlBullet ctrlShipBullet;
   private ControlBullet ctrlFaceBullet;
   private ControlShip ctrlShip;
@@ -15,10 +17,15 @@ class ControlObjects{
   private int framesBetweenBullets;
   private int framesBetweenFaceBullets;
 
-  
   SoundFile[] mouthSounds;
+  SoundFile hurtSound;
+  SoundFile shootSound;
+  SoundFile panSound;
 
-  public ControlObjects(Ship nave, int maxVelocityShip, int bulletSpeed, int framesBetweenBullets, int framesBetweenFaceBullets, float bulletRadius) {
+
+  public ControlObjects(PApplet parent, Ship nave, int maxVelocityShip, int bulletSpeed, int framesBetweenBullets, int framesBetweenFaceBullets, float bulletRadius) {
+    this.parent = parent;
+
     this.nave = nave;
     
     ctrlShipBullet = new ControlBullet(bulletSpeed, bulletRadius, color(255, 255, 0));
@@ -29,6 +36,15 @@ class ControlObjects{
     
     this.framesBetweenBullets = framesBetweenBullets;
     this.framesBetweenFaceBullets = framesBetweenFaceBullets;
+
+    mouthSounds = new SoundFile[7];
+    for (int i = 0; i < mouthSounds.length; i++) {
+      mouthSounds[i] = new SoundFile(parent, "sounds/boca" + i + ".wav");
+    }
+
+    panSound = new SoundFile(parent, "sounds/pan.wav");
+    hurtSound = new SoundFile(parent, "sounds/hurt.wav");
+    shootSound = new SoundFile(parent, "sounds/laser.wav");
   }
 
   private synchronized void moveBullets(){
@@ -60,6 +76,7 @@ class ControlObjects{
     if (currentControllerData.getR_BUMP() == 1){
       if(framesLastBullet < frameCount - framesBetweenBullets) {
         ctrlShipBullet.shoot(nave.getPos(), nave.getAngle(), 40);
+        shootSound.play();
         framesLastBullet = frameCount;
       }
     }
@@ -79,21 +96,26 @@ class ControlObjects{
 
   private synchronized void faceShoot(PVector pos){
     if(framesLastBulletFace < frameCount - framesBetweenFaceBullets){
-      int bullets = (int) random(10,15);
+      int bullets = (int) random(3,5) * 5;
       int angle = (int) 360/bullets;
       for (int i = 0; i < bullets; i++){
-        ctrlFaceBullet.shoot(pos, (int) (((i*angle) + random(0,10)) % 360), 10);
+        ctrlFaceBullet.shoot(pos, (int) (((i*angle) + random(0,20)) % 360), 10);
       }
+      mouthSounds[(int) random(0,mouthSounds.length - 1)].play();
       framesLastBulletFace = frameCount;
     }
   }
 
   private synchronized void checkEyeCollision(PVector[] polygon, GameEye eye){
-    ctrlShipBullet.checkPolygonCollision(polygon, eye);
+    if (ctrlShipBullet.checkPolygonCollision(polygon, eye)){
+      hurtSound.play();
+    }
   }
 
   private synchronized void checkCircleCollision(){
     //Size of ship image, hardcoded
-    ctrlFaceBullet.checkCircleCollision(nave, 23);
+    if (ctrlFaceBullet.checkCircleCollision(nave, 23)){
+      panSound.play();
+    }
   }
 }

@@ -35,15 +35,11 @@ static class Expressions{
   }
 
   public static boolean isOpen(FShape shape){
-    //println(verticalAmplitude(shape) / shape.getCamSize());
     if (verticalAmplitude(shape) / shape.getCamSize() > 25) return true;
     return false;
   }
   
   public static boolean isOpen(PVector[] contour, int imgSize, float threshold){
-    /*println("a: " + verticalAmplitude(contour));
-    println("b: " + imgSize);
-    println("c: " + verticalAmplitude(contour)/imgSize);*/
     if (verticalAmplitude(contour) / imgSize > threshold) return true;
     return false;
   }
@@ -60,18 +56,15 @@ static class Expressions{
     */
   public static boolean eyebrowIsLifted(RealEyebrow eyebrow){
     if (eyebrow != null) {
-      //println("distancia centro-ceja = " + (eyebrow.getFace().getCenter().y - eyebrow.getTop().y));
       if (eyebrow.getFace().getCenter().y - eyebrow.getTop().y > 50) return true;
     }
     return false;
   }
   
-  public static PVector[] getMinMax(PVector[] contour/*, float w, float h*/){
-    //println("Contour: "+ (Object[])contour);
+  public static PVector[] getMinMax(PVector[] contour){
     PVector max = new PVector(0, 0);
     PVector min = new PVector(Integer.MAX_VALUE, Integer.MAX_VALUE);
     for (PVector point : contour){
-      //println("Point: " + point);
       if (point.x > max.x) max.x = point.x;
       if (point.y > max.y) max.y = point.y;
       if (point.x < min.x) min.x = point.x;
@@ -81,15 +74,13 @@ static class Expressions{
     return new PVector[]{min, max};
   }
   
-  public static PVector[] getCorners(PVector[] contour/*, float w, float h*/){
-    //println("Contour: "+ (Object[])contour);
+  public static PVector[] getCorners(PVector[] contour){
     PVector topLeft = new PVector(Integer.MAX_VALUE, Integer.MAX_VALUE);
     PVector topRight = new PVector(0, Integer.MAX_VALUE);
     PVector bottomLeft = new PVector(Integer.MAX_VALUE, 0);
     PVector bottomRight = new PVector(0, 0);
     
     for (PVector point : contour){
-      //println("Point: " + point);
       if (point.x < topLeft.x) topLeft.x = point.x;
       if (point.y < topLeft.y) topLeft.y = point.y;
       
@@ -106,20 +97,15 @@ static class Expressions{
     return new PVector[]{topLeft, topRight, bottomLeft, bottomRight};
   }
   
-  public static PVector centerOf(PVector[] contour/*, float w, float h*/){
+  public static PVector centerOf(PVector[] contour){
     if (contour != null){
-      /**PVector max = contour[0];
-      PVector min = contour[0];**/
-      PVector[] minMax = getMinMax(contour/*, w, h*/);
-      return new PVector(minMax[0].x + ((minMax[1].x - minMax[0].x) / 2), minMax[0].y + ((minMax[1].y - minMax[0].y) / 2));//new Point(min.x + d/2, min.y + d/2);
+      PVector[] minMax = getMinMax(contour);
+      return new PVector(minMax[0].x + ((minMax[1].x - minMax[0].x) / 2), minMax[0].y + ((minMax[1].y - minMax[0].y) / 2));
     }
     return null;
   }
   
   public static float distance(FShape a, FShape b){
-    //println("FShape a = " + a.getCenter());
-    //println("FShape b = " + b.getCenter());
-    //println(dist(a.getCenter().x, a.getCenter().y, b.getCenter().x, b.getCenter().y));
     return dist(a.getCenter().x, a.getCenter().y, b.getCenter().x, b.getCenter().y);
   }
   
@@ -134,12 +120,7 @@ static class Expressions{
   public static float distanceFromCamera(int calibrationFactor, float reference){
     return calibrationFactor / reference;
   }
-  
-  /*public static float rotationOf(RealFace face){
-    PVector line = PVector.sub(face.getCenter(),face.getChin());
-    return PVector.angleBetween(line, new PVector(10,0));
-  }*/
-  
+    
   public static PVector makeRelative(PVector v, PVector center){
     return PVector.sub(v, center);
   }

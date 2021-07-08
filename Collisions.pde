@@ -60,13 +60,6 @@ static class Collisions{
     return point.y - linePointA.y == ((linePointB.y - linePointB.y) / (linePointB.x - linePointB.x))*(point.x - linePointA.x);
   }
     
-  /*static public boolean pointWithAngledRectangle(PVector[] points){
-    PVector top 
-  }
-
-  static public boolean pointWithQuadrilateral(PVector[] points){
-
-  }*/
   static public boolean pointWithPolygon(PVector point, PVector[] polygon){
     boolean col = false;
 
@@ -121,12 +114,6 @@ static class Collisions{
 
     return distToLine <= radius;
   }
-
-
-  //CircleWith
-  /*static public boolean circleWithLine(PVector cirPos, float radius, PVector linePointA, PVector linePointB){
-    return lineWithCircle(linePointA, linePointB, cirPos, radius);
-  }*/
 
   //remember to check if radius is the param you are using
   static public boolean circleWithCircle(PVector cirAPos, float radiusA, PVector cirBPos, float radiusB){    

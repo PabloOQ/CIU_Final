@@ -224,12 +224,7 @@ void draw(){
     case GAME:
       gameLogic();
       gameShow();
-      RealFace face;
-      if (currentFaceSuccess){
-        face = currentFace;
-      }else{
-        face = lastUsableFace;
-      }
+
       if (debug){
         beginShape();
         for (int i = 0; i < leftEye.length; i++) {
